@@ -1,51 +1,96 @@
 import numpy as np 
 import matplotlib.pyplot as plt
 
+# definizione di estremi di integrazione e funzione integranda 
+a = 0
+b = np.pi
+punti = 1000
+
+x = np.linspace(a, b, punti)
+
 def f(t): 
     return np.sin(t)
 
-x = np.linspace(-np.pi, np.pi, 1000)
-a = 2
 
-div_x = np.split(x, a)
-x_max = np.array([])
-y_max = np.array([])
+# calcolo del numero di rettangoli 
+divisori = []
+for i in range(1, punti+1): 
+    if punti %  i == 0: 
+        divisori.append(i)
 
-
-x_min = np.array([])
-y_min = np.array([])
-
-# linee tratteggiate che separano gli intervalli 
-
-for array in div_x[:-1]: 
-    plt.axvline(np.max(array), color = "gray", linestyle = "--")
+aree_massimi_tot = np.array([])
+aree_minimi_tot = np.array([])
 
 
-#calcolo dei minimi e dei massimi
-for array in div_x: 
-    y_max = np.append(y_max, np.max(f(array)))
-    indice = np.argmax(f(array))
-    x_max = np.append(x_max, array[indice])
+# SOSTITUISCI CON L'INTEGRAZIONE DI SCIPY 
+area_esatta = 2
 
 
-for array in div_x: 
-    y_min = np.append(y_min, np.min(f(array)))
-    indice = np.argmin(f(array))
-    x_min = np.append(x_min, array[indice])
+# calcolo delle aree con iterazioni
+for div in divisori: 
 
-#calcolo delle aree
-aree_max = np.array([])
-base = div_x[0][-1] - div_x[0][0]
-for i in x_max:
-    aree_max = np.append(aree_max, base * f(i))
+    div_x = np.split(x, div)
+    
+    x_max = np.array([])
+    y_max = np.array([])
 
-# print(aree_max)
-area = aree_max.sum()
-print(area)
-plt.plot(x, f(x), color = "red", label = "sin(x)")
-plt.axhline(0)
-plt.scatter(x_max, y_max, color = "green")
-# plt.scatter(x_min, y_max, color = "blue")
-plt.grid()
-plt.legend()
+    x_min = np.array([])
+    y_min = np.array([])
+
+
+    #calcolo dei minimi e dei massimi
+    for array in div_x: 
+        y_max = np.append(y_max, np.max(f(array)))
+        indice = np.argmax(f(array))
+        x_max = np.append(x_max, array[indice])
+
+    for array in div_x: 
+        y_min = np.append(y_min, np.min(f(array)))
+        indice = np.argmin(f(array))
+        x_min = np.append(x_min, array[indice])
+
+    # calcolo delle aree dei rettangoli con altezza pari ai minimi e massimi
+    area_rett_max = np.array([])
+    area_rett_min = np.array([])
+
+    base = (b-a)/div
+
+    for i in x_max:
+        area_rett_max = np.append(area_rett_max, base * f(i))
+
+    for i in x_min: 
+        area_rett_min = np.append(area_rett_min, base * f(i))
+
+    somme_superiori = area_rett_max.sum()
+    somme_inferiori = area_rett_min.sum()
+
+    aree_massimi_tot = np.append(aree_massimi_tot, somme_superiori)
+    aree_minimi_tot = np.append(aree_minimi_tot, somme_inferiori)
+
+
+
+#calcolo degli errori e delle iterazioni 
+err_massimo = (np.abs(aree_massimi_tot - area_esatta) / area_esatta)*100
+err_minimo = (np.abs(aree_minimi_tot - area_esatta) / area_esatta)*100
+
+n_iterazioni = np.arange(1, len(err_massimo)+1)
+
+
+# subplot della funzione integranda e dell'errore relativo in funzione dei tentativi
+fig, (ax1, ax2) = plt.subplots(2, 1)
+
+ax1.plot(x, f(x), label = "sin(x)")
+ax1.set_title("Funzione Integranda")
+ax1.grid()
+ax1.legend()
+
+ax2.plot(n_iterazioni, err_massimo, color = "red", linestyle = "--", label = "Err. massimo")
+ax2.plot(n_iterazioni, err_minimo, color = "orange", linestyle = "--", label = "Err. minimo")
+ax2.set_title("Errore relativo percentuale delle somme superiori e inferiori")
+ax2.legend()
+
+plt.tight_layout()
 plt.show()
+
+print(aree_massimi_tot)
+print(aree_minimi_tot)
