@@ -1,5 +1,6 @@
 import numpy as np 
 import matplotlib.pyplot as plt
+from scipy.integrate import quad
 
 # definizione di estremi di integrazione e funzione integranda 
 a = 0
@@ -23,7 +24,7 @@ aree_minimi_tot = np.array([])
 
 
 # SOSTITUISCI CON L'INTEGRAZIONE DI SCIPY 
-area_esatta = 2
+area_esatta, errore = quad(f, a, b)
 
 
 # calcolo delle aree con iterazioni
@@ -88,7 +89,9 @@ ax2.plot(n_iterazioni, err_massimo, color = "red", linestyle = "--", label = "Er
 ax2.plot(n_iterazioni, err_minimo, color = "orange", linestyle = "--", label = "Err. minimo")
 ax2.set_title("Errore relativo percentuale delle somme superiori e inferiori")
 ax2.legend()
-
+ax2.set_xticks(n_iterazioni)
+ax2.yaxis.set_major_formatter("{x:.0f}%")
+ax2.set_xlabel("n. iterazioni")
 plt.tight_layout()
 plt.show()
 
