@@ -29,7 +29,7 @@ a, b = popt
 
 t_fit = np.linspace(min(t), max(t), 5000)
 
-
+plt.figure(figsize=(8, 5))
 plt.plot(t_fit, 
         model_f(t_fit, a, b), 
         color = "crimson", 
@@ -54,5 +54,9 @@ plt.xlabel("Tempo [ms]")
 plt.ylabel("Tensione [V]")
 plt.legend(loc = "lower right")
 plt.tight_layout()
+
+plt.figure(figsize=(8, 5))
+plt.imshow(np.log(pcov))
+plt.colorbar()
 
 plt.show()
